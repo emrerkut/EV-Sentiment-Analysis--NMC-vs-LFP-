@@ -1,0 +1,11 @@
+pandas
+matplotlib
+seaborn
+textblob
+praw
+python-dotenv
+scikit-learn
+groq
+google-generativeai
+numpy
+scipy

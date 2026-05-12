@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EV Sentiment AI | Demo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --bg-color: #0f172a;
+            --panel-bg: rgba(30, 41, 59, 0.7);
+            --border: rgba(255, 255, 255, 0.1);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Outfit', sans-serif; }
+
+        body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            overflow-x: hidden;
+        }
+
+        /* Ambient glowing orbs */
+        .orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: -1;
+            opacity: 0.4;
+            animation: float 10s infinite ease-in-out alternate;
+        }
+        .orb-1 { top: -10%; left: -10%; width: 400px; height: 400px; background: #6366f1; }
+        .orb-2 { bottom: -10%; right: -10%; width: 500px; height: 500px; background: #c026d3; }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(50px, 50px) scale(1.1); }
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            z-index: 10;
+        }
+
+        @media (max-width: 900px) { .container { grid-template-columns: 1fr; } }
+
+        .glass-panel {
+            background: var(--panel-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 2.5rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            transition: transform 0.3s ease;
+        }
+
+        .glass-panel:hover { transform: translateY(-5px); }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(to right, #818cf8, #c026d3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        p.subtitle { color: var(--text-muted); margin-bottom: 2rem; font-size: 1.1rem; }
+        .form-group { margin-bottom: 1.5rem; }
+        label { display: block; margin-bottom: 0.5rem; font-weight: 600; color: #cbd5e1; font-size: 0.95rem; }
+        
+        input[type="text"], select {
+            width: 100%; background: rgba(15, 23, 42, 0.6); border: 1px solid var(--border);
+            color: white; padding: 1rem 1.2rem; border-radius: 12px; font-size: 1rem;
+            transition: all 0.2s ease; outline: none;
+        }
+        input[type="text"]:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2); }
+        input[type="text"]::placeholder { color: #475569; }
+        
+        select {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2394a3b8%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem top 50%;
+            background-size: 0.65rem auto;
+            padding-right: 2.5rem;
+        }
+        select option { background-color: #0f172a; color: white; }
+
+        button.btn-submit {
+            width: 100%; background: linear-gradient(135deg, var(--primary) 0%, #8b5cf6 100%);
+            color: white; border: none; padding: 1.2rem; border-radius: 12px; font-size: 1.1rem;
+            font-weight: 600; cursor: pointer; transition: all 0.3s ease; margin-top: 1rem;
+        }
+        button.btn-submit:hover { box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.5); transform: translateY(-2px); }
+
+        .results-panel { display: flex; flex-direction: column; justify-content: center; }
+        .placeholder-state { text-align: center; color: var(--text-muted); }
+        .placeholder-state svg { width: 64px; height: 64px; opacity: 0.5; margin-bottom: 1rem; }
+        .result-content { display: none; animation: fadeIn 0.5s ease-out; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .prediction-badge {
+            display: inline-block; padding: 0.5rem 1.5rem; border-radius: 50px; font-size: 1.5rem;
+            font-weight: 800; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 2rem;
+            text-align: center; width: 100%;
+        }
+
+        .badge-positive { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid #10b981; }
+        .badge-negative { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid #ef4444; }
+        .badge-neutral  { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid #f59e0b; }
+
+        .prob-bar-container { margin-bottom: 1.5rem; }
+        .prob-header { display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-weight: 600; font-size: 0.95rem; }
+        .prob-track { width: 100%; height: 12px; background: rgba(255,255,255,0.05); border-radius: 6px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); }
+        .prob-fill { height: 100%; border-radius: 6px; width: 0%; transition: width 1s cubic-bezier(0.16, 1, 0.3, 1); }
+
+        .fill-Positive { background: var(--success); box-shadow: 0 0 10px var(--success); }
+        .fill-Negative { background: var(--danger); box-shadow: 0 0 10px var(--danger); }
+        .fill-Neutral  { background: var(--warning); box-shadow: 0 0 10px var(--warning); }
+
+        .model-metrics { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border); display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .metric { background: rgba(0,0,0,0.2); padding: 1rem; border-radius: 12px; text-align: center; }
+        .metric-value { font-size: 1.5rem; font-weight: 800; color: white; }
+        .metric-label { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 0.25rem; }
+    </style>
+</head>
+<body>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+
+    <div class="container">
+        <div class="glass-panel">
+            <h1>EV Sentiment AI</h1>
+            <p class="subtitle" id="model-subtitle">Loading model info...</p>
+            <form id="predict-form">
+                <div id="dynamic-inputs">
+                    <!-- JavaScript burayı dolduracak -->
+                </div>
+                <button type="submit" class="btn-submit" id="submit-btn">Analyze Sentiment</button>
+            </form>
+        </div>
+
+        <div class="glass-panel results-panel">
+            <div class="placeholder-state" id="placeholder">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                <h2>Awaiting Data</h2>
+                <p>Submit features to see the model's prediction.</p>
+            </div>
+            <div class="result-content" id="result-content">
+                <div id="prediction-badge" class="prediction-badge badge-positive">Positive</div>
+                <h3 style="margin-bottom: 1rem; color: #cbd5e1;">Class Probabilities</h3>
+                <div id="probabilities-container"></div>
+                <div class="model-metrics" id="metrics-container"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = "http://localhost:5000";
+        let configData = null;
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const res = await fetch(`${API_BASE}/config?v=` + new Date().getTime());
+                configData = await res.json();
+                document.getElementById('model-subtitle').innerText = configData.model_info.model_name + " Model Demo";
+                
+                let html = '';
+                configData.feature_names.forEach((name, i) => {
+                    const label = configData.feature_labels[i] || name;
+                    const options = configData.feature_options ? configData.feature_options[name] : null;
+
+                    if (options && options.length > 0) {
+                        let optionsHtml = '<option value="" disabled selected>Select an option...</option>';
+                        options.forEach(opt => {
+                            optionsHtml += `<option value="${opt}">${opt}</option>`;
+                        });
+                        html += `
+                            <div class="form-group">
+                                <label for="${name}">${label}</label>
+                                <select id="${name}" required>
+                                    ${optionsHtml}
+                                </select>
+                            </div>`;
+                    } else {
+                        html += `
+                            <div class="form-group">
+                                <label for="${name}">${label}</label>
+                                <input type="text" id="${name}" required placeholder="Type value here..." autocomplete="off">
+                            </div>`;
+                    }
+                });
+                document.getElementById('dynamic-inputs').innerHTML = html;
+
+                if (configData.model_info) {
+                    document.getElementById('metrics-container').innerHTML = `
+                        <div class="metric"><div class="metric-value">${configData.model_info.metric1_value}</div><div class="metric-label">${configData.model_info.metric1_label}</div></div>
+                        <div class="metric"><div class="metric-value">${configData.model_info.metric2_value}</div><div class="metric-label">${configData.model_info.metric2_label}</div></div>
+                    `;
+                }
+            } catch (err) {
+                document.getElementById('dynamic-inputs').innerHTML = '<p style="color:#ef4444;">Could not connect to server. Run demo_server.py first!</p>';
+            }
+        });
+
+        document.getElementById('predict-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!configData) return;
+
+            const features = {};
+            configData.feature_names.forEach(name => { features[name] = document.getElementById(name).value; });
+
+            try {
+                const res = await fetch(`${API_BASE}/predict`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ features })
+                });
+                const result = await res.json();
+                
+                if (result.error) return alert("Error: " + result.error);
+
+                document.getElementById('placeholder').style.display = 'none';
+                const content = document.getElementById('result-content');
+                content.style.display = 'block';
+                content.style.animation = 'none'; content.offsetHeight; content.style.animation = null;
+
+                const badge = document.getElementById('prediction-badge');
+                const cls = result.predicted_class;
+                badge.textContent = cls;
+                badge.className = 'prediction-badge';
+                if (cls.toLowerCase() === 'positive') badge.classList.add('badge-positive');
+                else if (cls.toLowerCase() === 'negative') badge.classList.add('badge-negative');
+                else badge.classList.add('badge-neutral');
+
+                const probContainer = document.getElementById('probabilities-container');
+                probContainer.innerHTML = '';
+                const probs = result.all_probabilities;
+                const sortedClasses = Object.keys(probs).sort((a, b) => probs[b] - probs[a]);
+
+                sortedClasses.forEach(c => {
+                    let colorClass = 'fill-Neutral';
+                    if (c.toLowerCase() === 'positive') colorClass = 'fill-Positive';
+                    if (c.toLowerCase() === 'negative') colorClass = 'fill-Negative';
+
+                    probContainer.innerHTML += `
+                        <div class="prob-bar-container">
+                            <div class="prob-header"><span>${c}</span><span>${(probs[c] * 100).toFixed(1)}%</span></div>
+                            <div class="prob-track"><div class="prob-fill ${colorClass}" style="width: 0%"></div></div>
+                        </div>`;
+                });
+
+                setTimeout(() => {
+                    const fills = probContainer.querySelectorAll('.prob-fill');
+                    sortedClasses.forEach((c, i) => fills[i].style.width = (probs[c] * 100) + '%');
+                }, 50);
+
+            } catch (err) { alert("Server error."); }
+        });
+    </script>
+</body>
+</html>
