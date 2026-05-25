@@ -3,231 +3,1360 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EV Sentiment AI | Demo</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <title>EV Sentiment AI | Professional Demo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #6366f1;
-            --primary-hover: #4f46e5;
+            /* DARK THEME */
+            --bg-base: #030712; 
+            --bg-panel: rgba(17, 24, 39, 0.7); 
+            --bg-panel-solid: #111827;
+            --primary: #00d2ff; 
+            --primary-glow: rgba(0, 210, 255, 0.3);
+            --secondary: #00e676; 
+            --secondary-glow: rgba(0, 230, 118, 0.3);
+            
             --success: #10b981;
             --danger: #ef4444;
             --warning: #f59e0b;
-            --bg-color: #0f172a;
-            --panel-bg: rgba(30, 41, 59, 0.7);
-            --border: rgba(255, 255, 255, 0.1);
+            
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
+            --border: rgba(255, 255, 255, 0.1);
+            --input-bg: rgba(3, 7, 18, 0.6);
+            --nav-bg: rgba(3, 7, 18, 0.8);
+            
+            --nav-height: 80px;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Outfit', sans-serif; }
+        body.light-mode {
+            /* LIGHT THEME */
+            --bg-base: #f1f5f9; 
+            --bg-panel: rgba(255, 255, 255, 0.8); 
+            --bg-panel-solid: #ffffff;
+            --primary: #0284c7;
+            --secondary: #059669;
+            
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --border: rgba(0, 0, 0, 0.1);
+            --input-bg: #f8fafc;
+            --nav-bg: rgba(255, 255, 255, 0.9);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
 
         body {
-            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            background-color: var(--bg-base);
             color: var(--text-main);
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 2rem;
             overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 15% 50%, var(--primary-glow) 0%, transparent 50%),
+                radial-gradient(circle at 85% 30%, var(--secondary-glow) 0%, transparent 50%);
+            background-attachment: fixed;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
-        /* Ambient glowing orbs */
-        .orb {
-            position: fixed;
+        /* ----- NAVBAR ----- */
+        nav {
+            position: fixed; top: 0; width: 100%; height: var(--nav-height);
+            background: var(--nav-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between;
+            padding: 0 5%; z-index: 1000; transition: all 0.3s ease;
+        }
+
+        .nav-logo { font-size: 1.5rem; font-weight: 800; display: flex; align-items: center; gap: 5px; color: var(--text-main); text-decoration: none; }
+        .nav-logo span { background: linear-gradient(90deg, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+        .nav-center { display: flex; gap: 2rem; }
+        .nav-center a { color: var(--text-muted); text-decoration: none; font-weight: 500; transition: color 0.3s ease; }
+        .nav-center a:hover { color: var(--primary); }
+
+        .nav-controls { display: flex; align-items: center; gap: 1rem; }
+
+        .icon-btn {
+            background: transparent; border: 1px solid var(--border); color: var(--text-main);
+            width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: all 0.2s; font-size: 1.1rem;
+        }
+        .icon-btn:hover { background: var(--border); color: var(--primary); }
+
+        .nav-btn {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: #fff; padding: 0.6rem 1.2rem; border-radius: 8px; font-weight: 700;
+            text-decoration: none; transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 4px 15px rgba(0, 210, 255, 0.2); border: none; cursor: pointer;
+        }
+        body.light-mode .nav-btn { color: #fff; } 
+        .nav-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0, 230, 118, 0.3); }
+
+        .menu-toggle { display: none; background: none; border: none; color: var(--text-main); font-size: 1.5rem; cursor: pointer; }
+
+        @media (max-width: 900px) {
+            .nav-center { display: none; flex-direction: column; position: absolute; top: var(--nav-height); left: 0; width: 100%; background: var(--bg-panel-solid); padding: 1rem 5%; border-bottom: 1px solid var(--border); }
+            .nav-center.active { display: flex; }
+            .menu-toggle { display: block; }
+            .nav-btn { display: none; } 
+        }
+
+        /* ----- HERO SECTION ----- */
+        header {
+            padding-top: calc(var(--nav-height) + 4rem);
+            padding-bottom: 4rem;
+            min-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding-inline: 5%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Battery decorative images — 3D floating, no background */
+        .hero-battery {
+            position: absolute;
+            top: 50%;
+            width: 380px;
+            height: auto;
+            pointer-events: none;
+            z-index: 2;
+            mix-blend-mode: screen;
+            opacity: 0.90;
+            filter: saturate(1.4) brightness(1.15) contrast(1.05);
+            /* Radial mask: fades out edges so dark corners disappear */
+            -webkit-mask-image: radial-gradient(ellipse 82% 82% at 50% 50%, black 40%, transparent 75%);
+            mask-image:         radial-gradient(ellipse 82% 82% at 50% 50%, black 40%, transparent 75%);
+        }
+        body.light-mode .hero-battery {
+            mix-blend-mode: multiply;
+            opacity: 0.28;
+            filter: saturate(1.2) brightness(0.6);
+        }
+        .hero-battery-nmc {
+            left: 3%;
+            animation: floatNMC 9s ease-in-out infinite;
+        }
+        .hero-battery-lfp {
+            right: 3%;
+            animation: floatLFP 11s ease-in-out infinite;
+        }
+        @keyframes floatNMC {
+            0%   { transform: translateY(-55%) rotateY(-22deg) rotateZ(7deg)  translateX(0px); }
+            25%  { transform: translateY(-60%) rotateY(-16deg) rotateZ(4deg)  translateX(14px); }
+            50%  { transform: translateY(-46%) rotateY(-28deg) rotateZ(9deg)  translateX(-10px); }
+            75%  { transform: translateY(-53%) rotateY(-14deg) rotateZ(5deg)  translateX(18px); }
+            100% { transform: translateY(-55%) rotateY(-22deg) rotateZ(7deg)  translateX(0px); }
+        }
+        @keyframes floatLFP {
+            0%   { transform: translateY(-50%) rotateY(22deg)  rotateZ(-7deg) translateX(0px); }
+            25%  { transform: translateY(-42%) rotateY(16deg)  rotateZ(-4deg) translateX(-14px); }
+            50%  { transform: translateY(-60%) rotateY(28deg)  rotateZ(-10deg) translateX(10px); }
+            75%  { transform: translateY(-46%) rotateY(18deg)  rotateZ(-5deg) translateX(-18px); }
+            100% { transform: translateY(-50%) rotateY(22deg)  rotateZ(-7deg) translateX(0px); }
+        }
+        /* Hero text above batteries */
+        header > *:not(.hero-battery) { position: relative; z-index: 1; }
+        @media (max-width: 1200px) {
+            .hero-battery { width: 280px; }
+            .hero-battery-nmc { left: 1%; }
+            .hero-battery-lfp { right: 1%; }
+        }
+        @media (max-width: 900px) {
+            .hero-battery { width: 200px; opacity: 0.70; }
+            .hero-battery-nmc { left: -10px; }
+            .hero-battery-lfp { right: -10px; }
+        }
+        @media (max-width: 580px) { .hero-battery { display: none; } }
+
+        .badge { background: rgba(0, 210, 255, 0.1); border: 1px solid rgba(0, 210, 255, 0.3); color: var(--primary); padding: 0.5rem 1rem; border-radius: 50px; font-size: 0.875rem; font-weight: 600; margin-bottom: 1.5rem; letter-spacing: 1px; text-transform: uppercase; }
+        header h1 { font-size: 4rem; font-weight: 800; line-height: 1.1; margin-bottom: 1.5rem; max-width: 900px; }
+        header h1 span { background: linear-gradient(to right, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        header p.subtitle { font-size: 1.25rem; color: var(--text-muted); max-width: 700px; margin-bottom: 3rem; line-height: 1.6; }
+
+        .hero-buttons { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; }
+        .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-main); padding: 1rem 2rem; border-radius: 8px; font-weight: 600; text-decoration: none; transition: all 0.3s ease; }
+        .btn-outline:hover { border-color: var(--primary); background: rgba(0, 210, 255, 0.05); }
+
+        @media (max-width: 768px) {
+            header h1 { font-size: 2.5rem; }
+            header p.subtitle { font-size: 1rem; }
+            .hero-buttons { flex-direction: column; width: 100%; max-width: 300px; }
+            .hero-buttons a { text-align: center; }
+        }
+
+        /* ----- METHODOLOGY SECTION ----- */
+        .section-padding { padding: 6rem 5%; }
+        .section-header { text-align: center; margin-bottom: 4rem; }
+        .section-header h2 { font-size: 2.5rem; font-weight: 700; margin-bottom: 1rem; }
+        .section-header p { color: var(--text-muted); font-size: 1.1rem; }
+
+        .methodology-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem; max-width: 1200px; margin: 0 auto; }
+        .method-card { background: var(--bg-panel-solid); border: 1px solid var(--border); border-radius: 16px; padding: 2.5rem 2rem; text-align: center; transition: transform 0.3s ease, border-color 0.3s ease; }
+        .method-card:hover { transform: translateY(-5px); border-color: var(--primary); }
+        .method-icon { width: 64px; height: 64px; background: rgba(0, 210, 255, 0.1); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; color: var(--primary); }
+        .method-icon svg { width: 32px; height: 32px; }
+        .method-card h3 { font-size: 1.25rem; margin-bottom: 1rem; }
+        .method-card p { color: var(--text-muted); font-size: 0.95rem; line-height: 1.5; }
+
+        /* ----- DASHBOARD SECTION ----- */
+        .dashboard-container { max-width: 1400px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1.2fr 1fr; gap: 1.5rem; align-items: stretch; }
+        @media (max-width: 1300px) { .dashboard-container { grid-template-columns: 1fr 1fr; align-items: stretch; } .insights-panel { grid-column: 1 / -1; } }
+        @media (max-width: 768px) { .dashboard-container { grid-template-columns: 1fr; } .insights-panel { grid-column: auto; } }
+
+        /* ===== REACTIVE BACKGROUND OVERLAY ===== */
+        #dashboard { position: relative; isolation: isolate; }
+
+        /* Full-section colour overlay — background-color CAN be transitioned by CSS */
+        #dash-bg {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            border-radius: 0;
+            background-color: rgba(0, 210, 255, 0.10); /* default: blue */
+            transition: background-color 1.0s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        /* Large blurred spotlight blobs that also shift */
+        #dash-bg::before,
+        #dash-bg::after {
+            content: '';
+            position: absolute;
             border-radius: 50%;
-            filter: blur(80px);
-            z-index: -1;
-            opacity: 0.4;
-            animation: float 10s infinite ease-in-out alternate;
+            filter: blur(120px);
+            transition: background-color 1.0s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .orb-1 { top: -10%; left: -10%; width: 400px; height: 400px; background: #6366f1; }
-        .orb-2 { bottom: -10%; right: -10%; width: 500px; height: 500px; background: #c026d3; }
-
-        @keyframes float {
-            0% { transform: translate(0, 0) scale(1); }
-            100% { transform: translate(50px, 50px) scale(1.1); }
+        #dash-bg::before {
+            width: 55%; height: 80%;
+            top: 0; left: -5%;
+            background-color: rgba(0, 210, 255, 0.30); /* default blue blob left */
+        }
+        #dash-bg::after {
+            width: 50%; height: 80%;
+            bottom: 0; right: -5%;
+            background-color: rgba(0, 210, 255, 0.20); /* default blue blob right */
         }
 
-        .container {
-            width: 100%;
-            max-width: 1200px;
+        /* --- POSITIVE (green) --- */
+        #dash-bg.sent-positive                { background-color: rgba(16, 185, 129, 0.12); }
+        #dash-bg.sent-positive::before        { background-color: rgba(16, 185, 129, 0.45); }
+        #dash-bg.sent-positive::after         { background-color: rgba(0, 230, 118, 0.35); }
+        /* --- NEGATIVE (red) --- */
+        #dash-bg.sent-negative                { background-color: rgba(239, 68, 68, 0.12); }
+        #dash-bg.sent-negative::before        { background-color: rgba(239, 68, 68, 0.45); }
+        #dash-bg.sent-negative::after         { background-color: rgba(220, 38, 38, 0.35); }
+        /* --- NEUTRAL (yellow) --- */
+        #dash-bg.sent-neutral                 { background-color: rgba(245, 158, 11, 0.12); }
+        #dash-bg.sent-neutral::before         { background-color: rgba(245, 158, 11, 0.45); }
+        #dash-bg.sent-neutral::after          { background-color: rgba(217, 119, 6, 0.35); }
+
+        /* Light mode — same hues but less intense */
+        body.light-mode #dash-bg             { background-color: rgba(0, 210, 255, 0.06); }
+        body.light-mode #dash-bg::before     { background-color: rgba(0, 210, 255, 0.15); }
+        body.light-mode #dash-bg::after      { background-color: rgba(0, 210, 255, 0.10); }
+        body.light-mode #dash-bg.sent-positive               { background-color: rgba(16, 185, 129, 0.07); }
+        body.light-mode #dash-bg.sent-positive::before       { background-color: rgba(16, 185, 129, 0.22); }
+        body.light-mode #dash-bg.sent-positive::after        { background-color: rgba(0, 230, 118, 0.16); }
+        body.light-mode #dash-bg.sent-negative               { background-color: rgba(239, 68, 68, 0.07); }
+        body.light-mode #dash-bg.sent-negative::before       { background-color: rgba(239, 68, 68, 0.22); }
+        body.light-mode #dash-bg.sent-negative::after        { background-color: rgba(220, 38, 38, 0.16); }
+        body.light-mode #dash-bg.sent-neutral                { background-color: rgba(245, 158, 11, 0.07); }
+        body.light-mode #dash-bg.sent-neutral::before        { background-color: rgba(245, 158, 11, 0.22); }
+        body.light-mode #dash-bg.sent-neutral::after         { background-color: rgba(217, 119, 6, 0.16); }
+
+        /* Keep content above overlay */
+        #dashboard .section-header, #dashboard .dashboard-container { position: relative; z-index: 1; }
+
+        /* ----- DASHBOARD OVERRIDES FOR SINGLE PAGE VIEW ----- */
+        #dashboard {
+            position: relative;
+            isolation: isolate;
+            padding-top: calc(var(--nav-height) + 2rem) !important;
+            padding-bottom: 2rem !important;
+            min-height: calc(100vh - var(--nav-height));
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            box-sizing: border-box;
+        }
+
+        #dashboard .section-header {
+            margin-bottom: 1.5rem !important;
+        }
+
+        #dashboard .section-header h2 {
+            font-size: 2.2rem !important;
+            margin-bottom: 0.25rem !important;
+        }
+
+        #dashboard .section-header p {
+            font-size: 0.95rem !important;
+        }
+
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 2rem;
-            z-index: 10;
+            grid-template-columns: 1fr 1.2fr 1fr;
+            gap: 1.5rem;
+            align-items: stretch;
         }
 
-        @media (max-width: 900px) { .container { grid-template-columns: 1fr; } }
-
-        .glass-panel {
-            background: var(--panel-bg);
+        .glass-panel { 
+            border: 1px solid var(--border); 
+            border-radius: 24px; 
+            padding: 1.75rem; 
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2); 
+            position: relative; 
+            overflow: hidden; 
+            display: flex;
+            flex-direction: column;
+        }
+        .glass-panel::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: var(--bg-panel);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
-            border: 1px solid var(--border);
-            border-radius: 24px;
-            padding: 2.5rem;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            transition: transform 0.3s ease;
+            z-index: -1;
+            border-radius: inherit;
+            pointer-events: none;
+        }
+        .glass-panel > * {
+            position: relative;
+            z-index: 1;
+        }
+        .glass-panel::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: linear-gradient(90deg, var(--primary), var(--secondary)); opacity: 0; transition: opacity 0.3s ease; z-index: 2; }
+        .glass-panel:hover::before { opacity: 1; }
+
+        @media (max-height: 850px), (max-width: 1400px) {
+            .glass-panel { padding: 1.25rem; border-radius: 16px; }
+            .panel-title { margin-bottom: 1rem; padding-bottom: 0.5rem; font-size: 1.25rem; }
+            #dynamic-inputs { gap: 0.85rem; }
+            .form-group label { margin-bottom: 0.3rem; font-size: 0.82rem; }
+            .pill-group { height: 38px; }
+            .pill-label { font-size: 0.78rem; }
+            .prediction-badge { padding: 1rem; margin-bottom: 1rem; }
+            .pred-value { font-size: 2rem; }
+            .prob-title { margin-bottom: 0.75rem; font-size: 0.9rem; }
+            .prob-bar-container { margin-bottom: 0.65rem; }
+            .model-metrics { margin-top: 1.25rem; padding-top: 0.75rem; gap: 0.65rem; }
+            .metric { padding: 0.6rem; }
+            .metric-value { font-size: 1.3rem; }
+            .insights-card { margin-top: 0.75rem; padding: 0.85rem; }
+            .feature-importance-card { margin-top: 0.25rem; padding-top: 1rem; }
+            .feature-importance-card .prob-bar-container { margin-bottom: 0.75rem !important; }
         }
 
-        .glass-panel:hover { transform: translateY(-5px); }
+        @media (max-width: 600px) { .glass-panel { padding: 1rem; } }
 
-        h1 {
-            font-size: 2.5rem;
-            font-weight: 800;
-            margin-bottom: 0.5rem;
-            background: linear-gradient(to right, #818cf8, #c026d3);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+        .panel-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; border-bottom: 1px solid var(--border); padding-bottom: 1rem; }
+        .panel-subtitle { font-size: 0.85rem; color: var(--primary); font-weight: 600; background: rgba(0, 210, 255, 0.1); padding: 0.3rem 0.8rem; border-radius: 50px; }
+
+        /* Modern Form Grid */
+        #dynamic-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
         }
-
-        p.subtitle { color: var(--text-muted); margin-bottom: 2rem; font-size: 1.1rem; }
-        .form-group { margin-bottom: 1.5rem; }
-        label { display: block; margin-bottom: 0.5rem; font-weight: 600; color: #cbd5e1; font-size: 0.95rem; }
         
+        /* Make large dropdowns span full width */
+        .form-group.full-width { grid-column: 1 / -1; }
+        
+        .form-group { display: flex; flex-direction: column; }
+        label { margin-bottom: 0.6rem; font-weight: 500; color: var(--text-main); font-size: 0.9rem; letter-spacing: 0.5px; }
+
         input[type="text"], select {
-            width: 100%; background: rgba(15, 23, 42, 0.6); border: 1px solid var(--border);
-            color: white; padding: 1rem 1.2rem; border-radius: 12px; font-size: 1rem;
-            transition: all 0.2s ease; outline: none;
+            width: 100%; background: var(--input-bg); border: 1px solid var(--border); color: var(--text-main); padding: 0.9rem 1.2rem; border-radius: 12px; font-size: 1rem; transition: all 0.2s ease; outline: none; -webkit-appearance: none; appearance: none;
         }
-        input[type="text"]:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2); }
-        input[type="text"]::placeholder { color: #475569; }
+        input[type="text"]:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(0, 210, 255, 0.2); }
+        select { background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2394a3b8%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E"); background-repeat: no-repeat; background-position: right 1rem top 50%; background-size: 0.65rem auto; padding-right: 2.5rem; cursor: pointer; }
+        select option { background-color: var(--bg-panel-solid); color: var(--text-main); }
+
+        /* ---- Segmented Control (Pills) — redesigned ---- */
+        .pill-group {
+            display: flex;
+            background: rgba(0, 0, 0, 0.25);
+            border-radius: 12px;
+            padding: 4px;
+            border: 1px solid var(--border);
+            gap: 0;
+            height: 46px; /* fixed height so all segments are equal */
+        }
+        body.light-mode .pill-group {
+            background: rgba(0, 0, 0, 0.06);
+        }
+
+        .pill-group input[type="radio"] { display: none; }
+
+        .pill-label {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            letter-spacing: 0.3px;
+            transition: background 0.25s ease, color 0.25s ease, box-shadow 0.25s ease;
+            user-select: none;
+            white-space: nowrap;
+            padding: 0 0.5rem;
+        }
+        .pill-label:hover { color: var(--text-main); }
+
+        .pill-group input[type="radio"]:checked + .pill-label {
+            background: linear-gradient(135deg, rgba(0,210,255,0.22) 0%, rgba(0,230,118,0.18) 100%);
+            color: var(--primary);
+            font-weight: 700;
+            box-shadow: 0 2px 10px rgba(0, 210, 255, 0.25), inset 0 1px 0 rgba(255,255,255,0.08);
+        }
+        body.light-mode .pill-group input[type="radio"]:checked + .pill-label {
+            background: var(--primary);
+            color: #fff;
+            box-shadow: 0 2px 10px rgba(2, 132, 199, 0.35);
+        }
+
+        .btn-submit { grid-column: 1 / -1; background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); color: #fff; border: none; padding: 1.2rem; border-radius: 12px; font-size: 1.1rem; font-weight: 700; cursor: pointer; transition: all 0.3s ease; margin-top: 1rem; box-shadow: 0 4px 15px rgba(0, 210, 255, 0.2); position: relative; overflow: hidden; }
+        .btn-submit::after { content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent); transition: left 0.5s ease; }
+        .btn-submit:hover::after { left: 150%; }
+        .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0, 230, 118, 0.4); }
+
+        /* Results Panel Improvements */
+        .results-panel { justify-content: flex-start !important; }
+        .placeholder-state { text-align: center; color: var(--text-muted); padding: 5.5rem 1rem; }
+        .placeholder-state svg { width: 64px; height: 64px; opacity: 0.5; margin-bottom: 1.5rem; color: var(--primary); animation: pulse 3s infinite alternate; }
         
-        select {
-            appearance: none;
-            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2394a3b8%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
-            background-repeat: no-repeat;
-            background-position: right 1rem top 50%;
-            background-size: 0.65rem auto;
-            padding-right: 2.5rem;
-        }
-        select option { background-color: #0f172a; color: white; }
-
-        button.btn-submit {
-            width: 100%; background: linear-gradient(135deg, var(--primary) 0%, #8b5cf6 100%);
-            color: white; border: none; padding: 1.2rem; border-radius: 12px; font-size: 1.1rem;
-            font-weight: 600; cursor: pointer; transition: all 0.3s ease; margin-top: 1rem;
-        }
-        button.btn-submit:hover { box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.5); transform: translateY(-2px); }
-
-        .results-panel { display: flex; flex-direction: column; justify-content: center; }
-        .placeholder-state { text-align: center; color: var(--text-muted); }
-        .placeholder-state svg { width: 64px; height: 64px; opacity: 0.5; margin-bottom: 1rem; }
-        .result-content { display: none; animation: fadeIn 0.5s ease-out; }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        .prediction-badge {
-            display: inline-block; padding: 0.5rem 1.5rem; border-radius: 50px; font-size: 1.5rem;
-            font-weight: 800; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 2rem;
-            text-align: center; width: 100%;
+        @keyframes pulse {
+            0% { transform: scale(0.95); opacity: 0.3; }
+            100% { transform: scale(1.05); opacity: 0.7; }
         }
 
-        .badge-positive { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid #10b981; }
-        .badge-negative { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid #ef4444; }
-        .badge-neutral  { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid #f59e0b; }
+        .result-content { display: none; animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        .prob-bar-container { margin-bottom: 1.5rem; }
-        .prob-header { display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-weight: 600; font-size: 0.95rem; }
-        .prob-track { width: 100%; height: 12px; background: rgba(255,255,255,0.05); border-radius: 6px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); }
-        .prob-fill { height: 100%; border-radius: 6px; width: 0%; transition: width 1s cubic-bezier(0.16, 1, 0.3, 1); }
+        .prediction-badge { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1.25rem 2rem; border-radius: 16px; margin-bottom: 1.25rem; background: rgba(128,128,128,0.05); border: 1px solid var(--border); box-shadow: inset 0 0 20px rgba(0,0,0,0.1); }
+        .pred-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); margin-bottom: 0.25rem; text-align: center; font-weight: 600; }
+        .pred-value { font-size: 2.2rem; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; text-align: center; }
+        .badge-positive .pred-value { color: var(--success); text-shadow: 0 0 20px rgba(16, 185, 129, 0.4); }
+        .badge-positive { border-color: rgba(16, 185, 129, 0.4); background: rgba(16, 185, 129, 0.05); }
+        .badge-negative .pred-value { color: var(--danger); text-shadow: 0 0 20px rgba(239, 68, 68, 0.4); }
+        .badge-negative { border-color: rgba(239, 68, 68, 0.4); background: rgba(239, 68, 68, 0.05); }
+        .badge-neutral .pred-value { color: var(--warning); text-shadow: 0 0 20px rgba(245, 158, 11, 0.4); }
+        .badge-neutral { border-color: rgba(245, 158, 11, 0.4); background: rgba(245, 158, 11, 0.05); }
 
-        .fill-Positive { background: var(--success); box-shadow: 0 0 10px var(--success); }
-        .fill-Negative { background: var(--danger); box-shadow: 0 0 10px var(--danger); }
-        .fill-Neutral  { background: var(--warning); box-shadow: 0 0 10px var(--warning); }
+        .prob-title { font-size: 0.85rem; font-weight: 700; margin-bottom: 1rem; color: var(--text-main); border-bottom: 1px solid var(--border); padding-bottom: 0.35rem; text-transform: uppercase; letter-spacing: 1px; }
+        .prob-bar-container { margin-bottom: 0.85rem; }
+        .prob-header { display: flex; justify-content: space-between; margin-bottom: 0.35rem; font-weight: 600; font-size: 0.82rem; color: var(--text-main); }
+        .prob-track { width: 100%; height: 8px; background: var(--input-bg); border: 1px solid var(--border); border-radius: 4px; overflow: hidden; }
+        .prob-fill { height: 100%; border-radius: 4px; width: 0%; transition: width 1.5s cubic-bezier(0.22, 1, 0.36, 1); box-shadow: inset 0 0 10px rgba(255,255,255,0.2); }
+        .fill-Positive { background: linear-gradient(90deg, #059669, #10b981); } 
+        .fill-Negative { background: linear-gradient(90deg, #dc2626, #ef4444); } 
+        .fill-Neutral  { background: linear-gradient(90deg, #d97706, #f59e0b); }
 
-        .model-metrics { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border); display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-        .metric { background: rgba(0,0,0,0.2); padding: 1rem; border-radius: 12px; text-align: center; }
-        .metric-value { font-size: 1.5rem; font-weight: 800; color: white; }
-        .metric-label { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 0.25rem; }
+        .model-metrics { margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border); display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+        .metric { background: var(--input-bg); border: 1px solid var(--border); padding: 1.2rem; border-radius: 12px; text-align: center; transition: transform 0.2s; }
+        .metric:hover { transform: translateY(-3px); border-color: var(--primary); }
+        .metric-value { font-size: 1.8rem; font-weight: 800; color: var(--primary); margin-bottom: 0.2rem; }
+        .metric-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+
+        /* ----- FOOTER ----- */
+        footer { background: var(--bg-panel-solid); padding: 4rem 5% 2rem; border-top: 1px solid var(--border); margin-top: 4rem; }
+        .footer-content { max-width: 1200px; margin: 0 auto; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 2rem; }
+        .footer-brand h2 { font-size: 1.5rem; font-weight: 800; margin-bottom: 1rem; }
+        .footer-brand span { color: var(--primary); }
+        .footer-brand p { color: var(--text-muted); max-width: 300px; font-size: 0.9rem; line-height: 1.5; }
+        .footer-links h3 { font-size: 1rem; margin-bottom: 1rem; color: var(--text-main); }
+        .footer-links ul { list-style: none; }
+        .footer-links li { margin-bottom: 0.5rem; }
+        .footer-links a { color: var(--text-muted); text-decoration: none; font-size: 0.9rem; transition: color 0.2s; }
+        .footer-links a:hover { color: var(--primary); }
+        .copyright { text-align: center; padding-top: 2rem; margin-top: 2rem; border-top: 1px solid var(--border); color: var(--text-muted); font-size: 0.85rem; }
+
+        .copyright { text-align: center; padding-top: 2rem; margin-top: 2rem; border-top: 1px solid var(--border); color: var(--text-muted); font-size: 0.85rem; }
+
+        /* ----- TABS SWITCHER ----- */
+        .tabs-container {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+            position: relative;
+            z-index: 10;
+        }
+        .tab-btn {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: 0.8rem 2rem;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .tab-btn:hover {
+            color: var(--text-main);
+            border-color: rgba(255,255,255,0.25);
+            background: rgba(255, 255, 255, 0.06);
+            transform: translateY(-2px);
+        }
+        .tab-btn.active {
+            background: linear-gradient(135deg, rgba(0, 210, 255, 0.15) 0%, rgba(0, 230, 118, 0.12) 100%);
+            border-color: var(--primary);
+            color: var(--primary);
+            box-shadow: 0 4px 20px rgba(0, 210, 255, 0.15);
+            font-weight: 700;
+        }
+        body.light-mode .tab-btn {
+            background: rgba(0, 0, 0, 0.02);
+            color: var(--text-muted);
+        }
+        body.light-mode .tab-btn:hover {
+            background: rgba(0, 0, 0, 0.04);
+            color: var(--text-main);
+        }
+        body.light-mode .tab-btn.active {
+            background: var(--primary);
+            color: #fff;
+            border-color: var(--primary);
+            box-shadow: 0 4px 15px rgba(2, 132, 199, 0.25);
+        }
+
+        /* ----- BENCHMARKS PANEL ----- */
+        .benchmarks-panel {
+            width: 100%;
+            max-width: 1100px;
+            margin: 0 auto;
+            display: none;
+            animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            z-index: 1;
+        }
+        .benchmarks-grid {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 2rem;
+        }
+        @media (max-width: 900px) {
+            .benchmarks-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .benchmark-table-wrapper {
+            overflow-x: auto;
+            margin-top: 1rem;
+        }
+        .benchmark-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+        .benchmark-table th, .benchmark-table td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+        .benchmark-table th {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+        .benchmark-table td {
+            color: var(--text-main);
+            font-size: 0.95rem;
+        }
+        .benchmark-table tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+        body.light-mode .benchmark-table tr:hover td {
+            background: rgba(0, 0, 0, 0.01);
+        }
+        .algo-name {
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .algo-badge {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid var(--border);
+            padding: 0.2rem 0.5rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--text-muted);
+        }
+        .algo-badge.best {
+            background: rgba(16, 185, 129, 0.15);
+            border-color: var(--success);
+            color: var(--success);
+            font-weight: 700;
+        }
+        body.light-mode .algo-badge.best {
+            background: rgba(16, 185, 129, 0.1);
+        }
+        .score-val {
+            font-family: monospace;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+        .score-val.high {
+            color: var(--primary);
+        }
+        .score-val.highest {
+            color: var(--secondary);
+            font-weight: 700;
+        }
+
+        /* ----- DYNAMIC INSIGHTS CARD ----- */
+        .insights-card {
+            margin-top: 0.5rem;
+            padding: 0.85rem 1.1rem;
+            border-radius: 12px;
+            background: rgba(0, 210, 255, 0.03);
+            border: 1px solid rgba(0, 210, 255, 0.15);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+            transition: all 0.3s ease;
+        }
+        .insights-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 3px; height: 100%;
+            background: linear-gradient(to bottom, var(--primary), var(--secondary));
+        }
+        .insights-card-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .insights-card-desc {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+        .insights-card-desc strong {
+            color: var(--text-main);
+        }
+        .insights-chart {
+            display: flex;
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+            background: var(--input-bg);
+            border: 1px solid var(--border);
+            margin-top: 0.15rem;
+        }
+        .insights-chart-segment {
+            height: 100%;
+            transition: width 1s ease-in-out;
+        }
+        .segment-pos { background: var(--success); }
+        .segment-neu { background: var(--warning); }
+        .segment-neg { background: var(--danger); }
+        
+        .insights-legend {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+        .insights-legend span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .insights-legend span::before {
+            content: '';
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .legend-pos::before { background: var(--success); }
+        .legend-neu::before { background: var(--warning); }
+        .legend-neg::before { background: var(--danger); }
+
+        .radar-chart-placeholder {
+            background: var(--input-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            gap: 1rem;
+            height: 100%;
+        }
+        .radar-chart-placeholder svg {
+            width: 80px; height: 80px;
+            color: var(--primary);
+            opacity: 0.8;
+        }
     </style>
 </head>
 <body>
-    <div class="orb orb-1"></div>
-    <div class="orb orb-2"></div>
 
-    <div class="container">
-        <div class="glass-panel">
-            <h1>EV Sentiment AI</h1>
-            <p class="subtitle" id="model-subtitle">Loading model info...</p>
-            <form id="predict-form">
-                <div id="dynamic-inputs">
-                    <!-- JavaScript burayı dolduracak -->
+    <!-- NAVBAR -->
+    <nav>
+        <a href="#" class="nav-logo">EV<span>Sentiment</span></a>
+        
+        <div class="nav-center" id="nav-menu">
+            <a href="#home" data-i18n="nav_home">Home</a>
+            <a href="#methodology" data-i18n="nav_methodology">Methodology</a>
+            <a href="#dashboard" data-i18n="nav_demo">Demo</a>
+            <a href="#benchmarks" data-i18n="nav_tab_benchmarks">Model Benchmarks</a>
+        </div>
+
+        <div class="nav-controls">
+            <button class="icon-btn" id="theme-toggle" title="Toggle Light/Dark Mode">🌙</button>
+            <button class="icon-btn" id="lang-toggle" title="Toggle TR/EN" style="font-weight: 600; font-size: 0.9rem;">TR</button>
+            <button class="menu-toggle" id="mobile-menu-btn">☰</button>
+        </div>
+    </nav>
+
+    <!-- HERO SECTION -->
+    <header id="home">
+        <!-- Decorative battery images: NMC left, LFP right -->
+        <img src="nmc_battery.png" alt="NMC Battery" class="hero-battery hero-battery-nmc">
+        <img src="lfp_battery.png" alt="LFP Battery" class="hero-battery hero-battery-lfp">
+
+        <div class="badge" data-i18n="hero_badge">Research Project</div>
+        <h1 id="hero-title">Unveiling the True Drivers of <br><span>EV Satisfaction</span></h1>
+        <p class="subtitle" data-i18n="hero_subtitle">
+            A novel approach combining Reddit Data Scraping, LLM-driven Feature Extraction, and Machine Learning to predict Electric Vehicle user sentiment accurately.
+        </p>
+        <div class="hero-buttons">
+            <a href="#dashboard" class="nav-btn" style="padding: 1rem 2rem; font-size: 1.1rem;" data-i18n="btn_launch">Launch Dashboard</a>
+            <a href="#methodology" class="btn-outline" data-i18n="btn_how">How it Works</a>
+        </div>
+    </header>
+
+    <!-- METHODOLOGY SECTION -->
+    <section id="methodology" class="section-padding">
+        <div class="section-header">
+            <h2 data-i18n="meth_title">Our Methodology</h2>
+            <p data-i18n="meth_subtitle">From raw social media discussions to structured predictive insights.</p>
+        </div>
+        <div class="methodology-grid">
+            <div class="method-card">
+                <div class="method-icon">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
                 </div>
-                <button type="submit" class="btn-submit" id="submit-btn">Analyze Sentiment</button>
-            </form>
+                <h3 data-i18n="meth_1_title">1. Data Acquisition</h3>
+                <p data-i18n="meth_1_desc">We scraped real-world user discussions from top EV subreddits, filtering out noise to maintain high signal quality.</p>
+            </div>
+            <div class="method-card">
+                <div class="method-icon">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                </div>
+                <h3 data-i18n="meth_2_title">2. LLM Extraction</h3>
+                <p data-i18n="meth_2_desc">Using Groq (Llama-3) and Google Gemini, we transformed unstructured text into structured categorical features (e.g., Battery Type, Climate).</p>
+            </div>
+            <div class="method-card">
+                <div class="method-icon">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                </div>
+                <h3 data-i18n="meth_3_title">3. ML Prediction</h3>
+                <p data-i18n="meth_3_desc">Trained multiple classifiers (KNN, Decision Trees) handling class imbalance to predict user sentiment and find hidden patterns.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- DASHBOARD SECTION -->
+    <section id="dashboard" class="section-padding">
+        <!-- Reactive colour overlay: background-color transitions work, gradients don't -->
+        <div id="dash-bg"></div>
+        <div class="section-header">
+            <h2 data-i18n="dash_title">Interactive Model Demo</h2>
+            <p data-i18n="dash_subtitle">Input variables extracted by our LLM pipeline and see the model's sentiment prediction.</p>
         </div>
 
-        <div class="glass-panel results-panel">
-            <div class="placeholder-state" id="placeholder">
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                <h2>Awaiting Data</h2>
-                <p>Submit features to see the model's prediction.</p>
+        <div class="dashboard-container">
+            <!-- Left: Form -->
+            <div class="glass-panel">
+                <div class="panel-title">
+                    <span data-i18n="dash_input">Input Parameters</span>
+                    <span class="panel-subtitle" id="model-subtitle">Loading...</span>
+                </div>
+                <form id="predict-form">
+                    <div id="dynamic-inputs">
+                        <div style="grid-column: 1/-1; text-align: center; padding: 2rem; color: var(--text-muted);" data-i18n="dash_loading">
+                            Connecting to model server...
+                        </div>
+                    </div>
+                    <!-- Submit button is added dynamically inside the grid -->
+                </form>
             </div>
-            <div class="result-content" id="result-content">
-                <div id="prediction-badge" class="prediction-badge badge-positive">Positive</div>
-                <h3 style="margin-bottom: 1rem; color: #cbd5e1;">Class Probabilities</h3>
-                <div id="probabilities-container"></div>
-                <div class="model-metrics" id="metrics-container"></div>
+
+            <!-- Right: Results -->
+            <div class="glass-panel results-panel">
+                <div class="placeholder-state" id="placeholder">
+                    <!-- Tech/AI Icon -->
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"></path></svg>
+                    <h3 style="margin-bottom: 0.5rem;" data-i18n="dash_awaiting">Awaiting Data</h3>
+                    <p data-i18n="dash_select">Select parameters and click "Run Prediction Model" to see the sentiment analysis.</p>
+                </div>
+
+                <div class="result-content" id="result-content">
+                    <div id="prediction-badge" class="prediction-badge badge-positive">
+                        <div class="pred-label" data-i18n="dash_pred_label">Predicted Sentiment</div>
+                        <div class="pred-value" id="pred-value-text">Positive</div>
+                    </div>
+                    
+                    <div class="prob-title" data-i18n="dash_prob">Class Probabilities</div>
+                    <div id="probabilities-container"></div>
+                    
+                    <div class="model-metrics" id="metrics-container"></div>
+                </div>
+            </div>
+
+            <!-- Column 3: Data-Driven Insights & Feature Importance (Right) -->
+            <div class="glass-panel insights-panel" style="display: flex; flex-direction: column; justify-content: start; gap: 0.75rem;">
+                <div class="panel-title" style="margin-bottom: 0;">
+                    <span data-i18n="fi_insights_title">Data & model Insights</span>
+                </div>
+                
+                <!-- Dynamic Data Insights Card -->
+                <div id="dynamic-insights-container">
+                    <div class="insights-card" style="background: rgba(255,255,255,0.01); border-color: var(--border);">
+                        <div class="insights-card-title" style="color: var(--text-muted);">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <span data-i18n="fi_awaiting">Data-Driven Insights</span>
+                        </div>
+                        <div class="insights-card-desc" data-i18n="fi_awaiting_desc">Run prediction to see dynamic statistics from the Reddit reviews dataset.</div>
+                    </div>
+                </div>
+
+                <!-- Feature Importance Card -->
+                <div class="feature-importance-card" style="margin-top: 0.25rem; padding-top: 0.75rem; border-top: 1px solid var(--border);">
+                    <div class="insights-card-title" style="margin-bottom: 0.75rem; color: var(--secondary);">
+                        <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2z"></path></svg>
+                        <span data-i18n="fi_title">Model Feature Importance</span>
+                    </div>
+                    
+                    <!-- Feature 1: Brand -->
+                    <div class="prob-bar-container" style="margin-bottom: 0.65rem;">
+                        <div class="prob-header" style="font-size: 0.82rem; margin-bottom: 0.25rem;">
+                            <span data-i18n="fi_label_brand">🚗 Car Brand (LLM_Brand)</span>
+                            <span style="color: var(--primary);">28.1%</span>
+                        </div>
+                        <div class="prob-track" style="height: 6px; background: rgba(255,255,255,0.03);">
+                            <div class="prob-fill fill-Positive" style="width: 28.1%; height: 100%;"></div>
+                        </div>
+                        <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.15rem;" data-i18n="fi_desc_brand">Most decisive factor</div>
+                    </div>
+
+                    <!-- Feature 2: Patience -->
+                    <div class="prob-bar-container" style="margin-bottom: 0.65rem;">
+                        <div class="prob-header" style="font-size: 0.82rem; margin-bottom: 0.25rem;">
+                            <span data-i18n="fi_label_patience">⏳ Patience Level (LLM_Patience)</span>
+                            <span style="color: var(--primary);">22.9%</span>
+                        </div>
+                        <div class="prob-track" style="height: 6px; background: rgba(255,255,255,0.03);">
+                            <div class="prob-fill fill-Positive" style="width: 22.9%; height: 100%;"></div>
+                        </div>
+                        <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.15rem;" data-i18n="fi_desc_patience">User's patience is second in sentiment prediction!</div>
+                    </div>
+
+                    <!-- Feature 3: Climate -->
+                    <div class="prob-bar-container" style="margin-bottom: 0.65rem;">
+                        <div class="prob-header" style="font-size: 0.82rem; margin-bottom: 0.25rem;">
+                            <span data-i18n="fi_label_climate">☀️ Climate Temperature (LLM_Climate)</span>
+                            <span style="color: var(--primary);">19.1%</span>
+                        </div>
+                        <div class="prob-track" style="height: 6px; background: rgba(255,255,255,0.03);">
+                            <div class="prob-fill fill-Positive" style="width: 19.1%; height: 100%;"></div>
+                        </div>
+                        <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.15rem;" data-i18n="fi_desc_climate">Hot/Cold effect</div>
+                    </div>
+
+                    <!-- Feature 4: Commute -->
+                    <div class="prob-bar-container" style="margin-bottom: 0.65rem;">
+                        <div class="prob-header" style="font-size: 0.82rem; margin-bottom: 0.25rem;">
+                            <span data-i18n="fi_label_commute">🛣️ Daily Commute (LLM_Commute)</span>
+                            <span style="color: var(--primary);">13.5%</span>
+                        </div>
+                        <div class="prob-track" style="height: 6px; background: rgba(255,255,255,0.03);">
+                            <div class="prob-fill fill-Neutral" style="width: 13.5%; height: 100%;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Feature 5: Home Charging -->
+                    <div class="prob-bar-container" style="margin-bottom: 0.65rem;">
+                        <div class="prob-header" style="font-size: 0.82rem; margin-bottom: 0.25rem;">
+                            <span data-i18n="fi_label_home_charging">🔌 Home Charging (LLM_Home_Charging)</span>
+                            <span style="color: var(--primary);">10.1%</span>
+                        </div>
+                        <div class="prob-track" style="height: 6px; background: rgba(255,255,255,0.03);">
+                            <div class="prob-fill fill-Neutral" style="width: 10.1%; height: 100%;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Feature 6: Battery -->
+                    <div class="prob-bar-container" style="margin-bottom: 0.25rem;">
+                        <div class="prob-header" style="font-size: 0.82rem; margin-bottom: 0.25rem;">
+                            <span data-i18n="fi_label_battery">🔋 Battery Type (LLM_Battery)</span>
+                            <span style="color: var(--primary);">6.3%</span>
+                        </div>
+                        <div class="prob-track" style="height: 6px; background: rgba(255,255,255,0.03);">
+                            <div class="prob-fill fill-Negative" style="width: 6.3%; height: 100%;"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
+    </section>
 
+    <!-- MODEL BENCHMARKS SECTION -->
+    <section id="benchmarks" class="section-padding" style="padding-top: 0;">
+        <div class="section-header">
+            <h2 data-i18n="bench_title">Model Comparison Matrix</h2>
+            <p data-i18n="bench_subtitle">Academic Results & Algorithm Benchmarks</p>
+        </div>
+        <div style="width: 100%; max-width: 1200px; margin: 0 auto;">
+            <div class="glass-panel" style="padding: 2.5rem; display: flex; flex-direction: column; gap: 2rem;">
+                
+                <!-- Table Part -->
+                <div class="benchmark-table-wrapper">
+                    <table class="benchmark-table">
+                        <thead>
+                            <tr>
+                                <th data-i18n="bench_algo">Algorithm</th>
+                                <th data-i18n="bench_cv_auc">CV AUC-ROC</th>
+                                <th data-i18n="bench_tuning">Optimization</th>
+                                <th data-i18n="bench_f1">F1 Weighted</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <div class="algo-name">
+                                        <span>Logistic Regression</span>
+                                        <span class="algo-badge">Baseline</span>
+                                    </div>
+                                </td>
+                                <td><span class="score-val">0.6504</span></td>
+                                <td>L2 Reg (Default)</td>
+                                <td>0.638</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="algo-name">
+                                        <span>Decision Tree</span>
+                                        <span class="algo-badge">Baseline</span>
+                                    </div>
+                                </td>
+                                <td><span class="score-val">0.6606</span></td>
+                                <td>Min Samples Split=10</td>
+                                <td>0.652</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="algo-name">
+                                        <span>K-Nearest Neighbours</span>
+                                        <span class="algo-badge">Previous Model</span>
+                                    </div>
+                                </td>
+                                <td><span class="score-val">0.6833</span></td>
+                                <td>K=9, Uniform</td>
+                                <td>0.619</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="algo-name">
+                                        <span>Gradient Boosting</span>
+                                        <span class="algo-badge">Ensemble</span>
+                                    </div>
+                                </td>
+                                <td><span class="score-val">0.6827</span></td>
+                                <td>GridSearch Tuned</td>
+                                <td>0.658</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="algo-name">
+                                        <span>Support Vector Machine (SVM)</span>
+                                        <span class="algo-badge">Ensemble</span>
+                                    </div>
+                                </td>
+                                <td><span class="score-val high">0.6984</span></td>
+                                <td>RBF Kernel</td>
+                                <td>0.662</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="algo-name">
+                                        <span style="color: var(--secondary); font-weight: 700;">Random Forest (Tuned)</span>
+                                        <span class="algo-badge best" data-i18n="bench_active">Active Model</span>
+                                    </div>
+                                </td>
+                                <td><span class="score-val highest">0.7183</span></td>
+                                <td style="color: var(--secondary); font-weight: 600;">RandomSearch + SMOTE</td>
+                                <td class="score-val highest">0.666</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Academic Insights Part (Vertical Stack) -->
+                <div style="border-top: 1px solid var(--border); padding-top: 2rem; display: flex; align-items: start; gap: 1.5rem; flex-wrap: wrap;">
+                    <div style="background: rgba(0, 210, 255, 0.08); border-radius: 12px; padding: 1rem; color: var(--primary); display: flex; align-items: center; justify-content: center;">
+                        <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    </div>
+                    <div style="flex: 1; min-width: 250px;">
+                        <h3 data-i18n="bench_insights_title" style="color: var(--primary); font-size: 1.1rem; margin-bottom: 0.5rem; font-weight: 700;">Academic Insights</h3>
+                        <p data-i18n="bench_insights_desc" style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.6;">
+                            Our evaluation shows that handling <strong>class imbalance</strong> via SMOTEN and utilizing ensemble tree structures (Random Forest) significantly improves the model's capacity to predict customer satisfaction compared to simpler algorithms.
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-brand">
+                <h2>EV<span>Sentiment</span></h2>
+                <p data-i18n="footer_desc">Developed as part of the COMP4202 Practical Data Science course. An academic study on LLM-Augmented User Satisfaction.</p>
+            </div>
+            <div class="footer-links">
+                <h3 data-i18n="footer_team">Contributors</h3>
+                <ul>
+                    <li>Keramettin Kutnu</li>
+                    <li>Yasin Eren Alacahan</li>
+                    <li>Emre Erkut</li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h3 data-i18n="footer_tech">Technologies</h3>
+                <ul>
+                    <li>Python (Scikit-Learn)</li>
+                    <li>Groq &amp; Gemini APIs</li>
+                    <li>Flask Backend</li>
+                    <li>Vanilla HTML/CSS/JS</li>
+                </ul>
+            </div>
+        </div>
+        <div class="copyright" data-i18n="footer_copy">
+            &copy; 2026 EV Sentiment Project Team. All rights reserved.
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT -->
     <script>
+        // --- TRANSLATION DICTIONARY ---
+        const translations = {
+            en: {
+                nav_home: "Home", nav_methodology: "Methodology", nav_demo: "Demo", nav_try: "Try Model",
+                hero_badge: "Research Project",
+                hero_title_html: "Unveiling the True Drivers of <br><span>EV Satisfaction</span>",
+                hero_subtitle: "A novel approach combining Reddit Data Scraping, LLM-driven Feature Extraction, and Machine Learning to predict Electric Vehicle user sentiment accurately.",
+                btn_launch: "Launch Dashboard", btn_how: "How it Works",
+                meth_title: "Our Methodology", meth_subtitle: "From raw social media discussions to structured predictive insights.",
+                meth_1_title: "1. Data Acquisition", meth_1_desc: "We scraped real-world user discussions from top EV subreddits, filtering out noise to maintain high signal quality.",
+                meth_2_title: "2. LLM Extraction", meth_2_desc: "Using Groq (Llama-3) and Google Gemini, we transformed unstructured text into structured categorical features (e.g., Battery Type, Climate).",
+                meth_3_title: "3. ML Prediction", meth_3_desc: "Trained multiple classifiers (KNN, Decision Trees) handling class imbalance to predict user sentiment and find hidden patterns.",
+                dash_title: "Interactive Model Demo", dash_subtitle: "Input variables extracted by our LLM pipeline and see the model's sentiment prediction.",
+                dash_input: "Input Parameters", dash_loading: "Connecting to model server...", btn_run: "Run Prediction Model", btn_running: "Analyzing...",
+                dash_awaiting: "Awaiting Data", dash_select: "Select parameters and click 'Run Prediction Model' to see the sentiment analysis.",
+                dash_pred_label: "Predicted Sentiment", dash_prob: "Class Probabilities",
+                footer_desc: "Developed as part of the COMP4202 Practical Data Science course. An academic study on LLM-Augmented User Satisfaction.",
+                footer_team: "Contributors", footer_role: "Data Scientist", footer_tech: "Technologies", footer_copy: "© 2026 EV Sentiment Project Team. All rights reserved.",
+                err_connect: "Could not connect to the backend server.",
+                err_desc: "Please run <code>python demo_server.py</code> in your terminal and refresh this page.",
+                lbl_CarModel: "Car Model", lbl_BatteryType: "Battery Type", lbl_Temperature: "Temperature", lbl_DailyCommute: "Daily Commute", lbl_HomeCharging: "Home Charging", lbl_PatienceLevel: "Patience Level",
+                opt_select: "Search or select...",
+                // Value translations
+                val_Hot: "Hot", val_Cold: "Cold", val_Mild: "Mild",
+                val_Long: "Long", val_Short: "Short",
+                val_Yes: "Yes", val_No: "No",
+                val_NMC: "NMC", val_LFP: "LFP",
+                val_Low: "Low", val_High: "High", val_Unknown: "Unknown",
+                // Battery tooltips
+                tt_nmc_title: "NMC Battery",
+                tt_nmc_1: "High energy density — longer range per charge.",
+                tt_nmc_2: "Used by Tesla, BMW, and most premium EVs.",
+                tt_nmc_3: "More sensitive to heat; faster degradation in hot climates.",
+                tt_nmc_4: "Higher cost due to cobalt content.",
+                tt_nmc_tag: "High Density",
+                tt_lfp_title: "LFP Battery",
+                tt_lfp_1: "Exceptional cycle life — lasts 2–3× longer than NMC.",
+                tt_lfp_2: "Thermally stable — safer, lower fire risk.",
+                tt_lfp_3: "Used by Tesla (Standard Range), BYD, and budget EVs.",
+                tt_lfp_4: "Lower energy density — shorter range but more durable.",
+                tt_lfp_tag: "Long Lifespan",
+                nav_tab_demo: "Interactive Demo", nav_tab_benchmarks: "Model Benchmarks",
+                bench_title: "Model Comparison Matrix", bench_subtitle: "Academic Results",
+                bench_algo: "Algorithm", bench_cv_auc: "CV AUC-ROC", bench_tuning: "Optimization",
+                bench_f1: "F1 Weighted", bench_active: "Active Model",
+                bench_insights_title: "Academic Insights",
+                bench_insights_desc: "Our evaluation shows that handling <strong>class imbalance</strong> via SMOTEN and utilizing ensemble tree structures (Random Forest) significantly improves the model's capacity to predict customer satisfaction compared to simpler algorithms.",
+                fi_insights_title: "Data & Model Insights",
+                fi_title: "Model Feature Importance",
+                fi_label_brand: "🚗 Car Brand (LLM_Brand)",
+                fi_label_patience: "⏳ Patience Level (LLM_Patience)",
+                fi_label_climate: "☀️ Climate Temperature (LLM_Climate)",
+                fi_label_commute: "🛣️ Daily Commute (LLM_Commute)",
+                fi_label_home_charging: "🔌 Home Charging (LLM_Home_Charging)",
+                fi_label_battery: "🔋 Battery Type (LLM_Battery)",
+                fi_desc_brand: "Most decisive factor",
+                fi_desc_patience: "User's patience is second in sentiment prediction!",
+                fi_desc_climate: "Hot/Cold effect",
+                fi_awaiting: "Data-Driven Insights",
+                fi_awaiting_desc: "Run prediction to see dynamic statistics from the Reddit reviews dataset."
+            },
+            tr: {
+                nav_home: "Ana Sayfa", nav_methodology: "Metodoloji", nav_demo: "Demo", nav_try: "Modeli Dene",
+                hero_badge: "Araştırma Projesi",
+                hero_title_html: "Elektrikli Araç Memnuniyetinin <br><span>Gerçek Sırları</span>",
+                hero_subtitle: "Elektrikli Araç kullanıcılarının hislerini doğru bir şekilde tahmin etmek için Reddit Veri Kazıma, LLM tabanlı Özellik Çıkarımı ve Makine Öğrenmesini birleştiren yeni bir yaklaşım.",
+                btn_launch: "Panele Git", btn_how: "Nasıl Çalışır?",
+                meth_title: "Metodolojimiz", meth_subtitle: "Ham sosyal medya tartışmalarından yapılandırılmış tahminlere uzanan yolculuk.",
+                meth_1_title: "1. Veri Toplama", meth_1_desc: "En popüler EV subredditlerinden gerçek kullanıcı tartışmalarını kazıdık ve kaliteyi korumak için gürültüleri filtreledik.",
+                meth_2_title: "2. LLM Çıkarımı", meth_2_desc: "Groq (Llama-3) ve Google Gemini kullanarak yapılandırılmamış metinleri kategorik özelliklere dönüştürdük.",
+                meth_3_title: "3. ML Tahmini", meth_3_desc: "Sınıf dengesizliklerini çözerek kullanıcı duyarlılığını (sentiment) tahmin etmek için çeşitli modeller eğittik.",
+                dash_title: "İnteraktif Model Demosu", dash_subtitle: "LLM hattımız tarafından çıkarılan değişkenleri seçin ve modelin tahminini görün.",
+                dash_input: "Girdi Parametreleri", dash_loading: "Model sunucusuna bağlanılıyor...", btn_run: "Modeli Çalıştır", btn_running: "Analiz Ediliyor...",
+                dash_awaiting: "Veri Bekleniyor", dash_select: "Duygu analizini görmek için parametreleri seçin ve 'Modeli Çalıştır' butonuna tıklayın.",
+                dash_pred_label: "Tahmin Edilen Duygu", dash_prob: "Sınıf Olasılıkları",
+                footer_desc: "COMP4202 Pratik Veri Bilimi dersinin bir parçası olarak geliştirilmiştir. LLM-Destekli Kullanıcı Memnuniyeti üzerine akademik bir çalışma.",
+                footer_team: "Katkıda Bulunanlar", footer_role: "Veri Bilimci", footer_tech: "Teknolojiler", footer_copy: "© 2026 EV Sentiment Proje Ekibi. Tüm hakları saklıdır.",
+                err_connect: "Arka uç sunucusuna bağlanılamadı.",
+                err_desc: "Lütfen terminalinizde <code>python demo_server.py</code> komutunu çalıştırın ve bu sayfayı yenileyin.",
+                lbl_CarModel: "Araç Modeli", lbl_BatteryType: "Batarya Tipi", lbl_Temperature: "Hava Durumu", lbl_DailyCommute: "Günlük Sürüş", lbl_HomeCharging: "Evde Şarj", lbl_PatienceLevel: "Sabır Seviyesi",
+                opt_select: "Seçiniz...",
+                // Value translations
+                val_Hot: "Sıcak", val_Cold: "Soğuk", val_Mild: "Ilıman",
+                val_Long: "Uzun", val_Short: "Kısa",
+                val_Yes: "Evet", val_No: "Hayır",
+                val_NMC: "NMC", val_LFP: "LFP",
+                val_Low: "Düşük", val_High: "Yüksek", val_Unknown: "Bilinmiyor",
+                // Batarya tooltip çevirileri
+                tt_nmc_title: "NMC Batarya",
+                tt_nmc_1: "Yüksek enerji yoğunluğu — şarj başına daha uzun menzil.",
+                tt_nmc_2: "Tesla, BMW ve çoğu premium EV tarafından kullanılır.",
+                tt_nmc_3: "Isıya daha duyarlı; sıcak iklimlerde daha hızlı bozulur.",
+                tt_nmc_4: "Kobalt içeriği nedeniyle daha yüksek maliyet.",
+                tt_nmc_tag: "Yüksek Yoğunluk",
+                tt_lfp_title: "LFP Batarya",
+                tt_lfp_1: "Olağanüstü şarj döngüsü ömrü — NMC'den 2–3 kat uzun dayanır.",
+                tt_lfp_2: "Isıl kararlılık — daha güvenli, düşük yangın riski.",
+                tt_lfp_3: "Tesla (Standart Menzil), BYD ve bütçe EV'lerinde kullanılır.",
+                tt_lfp_4: "Daha düşük enerji yoğunluğu — kısa menzil ama dayanıklı.",
+                tt_lfp_tag: "Uzun Ömür",
+                nav_tab_demo: "İnteraktif Demo", nav_tab_benchmarks: "Model Karşılaştırmaları",
+                bench_title: "Model Kıyaslama Matrisi", bench_subtitle: "Akademik Sonuçlar",
+                bench_algo: "Algoritma", bench_cv_auc: "CV AUC-ROC", bench_tuning: "Optimizasyon",
+                bench_f1: "Ağırlıklı F1", bench_active: "Aktif Model",
+                bench_insights_title: "Akademik Çıkarımlar",
+                bench_insights_desc: "Değerlendirmemiz, SMOTEN aracılığıyla <strong>sınıf dengesizliğini</strong> yönetmenin ve topluluk ağaç yapılarını (Random Forest) kullanmanın, modeli daha basit algoritmalara kıyasla müşteri memnuniyetini tahmin etmede önemli ölçüde güçlendirdiğini kanıtlamaktadır.",
+                fi_insights_title: "Veri ve Model Analizleri",
+                fi_title: "Öznitelik Önem Dereceleri",
+                fi_label_brand: "🚗 Araç Markası (LLM_Brand)",
+                fi_label_patience: "⏳ Sabır Seviyesi (LLM_Patience)",
+                fi_label_climate: "☀️ Hava Sıcaklığı (LLM_Climate)",
+                fi_label_commute: "🛣️ Günlük Sürüş Mesafesi (LLM_Commute)",
+                fi_label_home_charging: "🔌 Evde Şarj İmkanı (LLM_Home_Charging)",
+                fi_label_battery: "🔋 Batarya Tipi (LLM_Battery)",
+                fi_desc_brand: "En belirleyici faktör",
+                fi_desc_patience: "Kullanıcının sabrı duygu tahmininde ikinci sırada!",
+                fi_desc_climate: "Sıcak/Soğuk etkisi",
+                fi_awaiting: "Veri Seti Analizleri",
+                fi_awaiting_desc: "Reddit yorum veri setimizdeki dinamik istatistikleri görmek için tahmini çalıştırın."
+            }
+        };
+
+        let currentLang = 'en';
+
+        function updateLanguage(lang) {
+            currentLang = lang;
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[lang][key]) el.innerHTML = translations[lang][key];
+            });
+            document.getElementById('hero-title').innerHTML = translations[lang].hero_title_html;
+            document.getElementById('lang-toggle').innerText = lang === 'en' ? 'TR' : 'EN';
+            
+            if (configData) renderForm(); // Re-render to translate dynamic labels/options
+        }
+
+        document.getElementById('lang-toggle').addEventListener('click', () => {
+            updateLanguage(currentLang === 'en' ? 'tr' : 'en');
+        });
+
+        // --- THEME TOGGLE ---
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        themeToggleBtn.addEventListener('click', () => {
+            document.body.classList.toggle('light-mode');
+            const isLight = document.body.classList.contains('light-mode');
+            themeToggleBtn.innerText = isLight ? '☀️' : '🌙';
+        });
+
+        // --- MOBILE MENU TOGGLE ---
+        document.getElementById('mobile-menu-btn').addEventListener('click', () => {
+            document.getElementById('nav-menu').classList.toggle('active');
+        });
+
+
+
+        // --- API INTEGRATION & DYNAMIC FORM BUILDER ---
         const API_BASE = "http://localhost:5000";
         let configData = null;
 
+        function getTranslatedLabel(englishLabel) {
+            const key = "lbl_" + englishLabel.replace(/\s+/g, '');
+            return translations[currentLang][key] || englishLabel;
+        }
+
+        function getTranslatedValue(englishVal) {
+            const key = "val_" + englishVal.replace(/\s+/g, '');
+            return translations[currentLang][key] || englishVal;
+        }
+
+        function renderForm() {
+            if (!configData) return;
+            let html = '';
+            configData.feature_names.forEach((name, i) => {
+                const baseLabel = configData.feature_labels[i] || name;
+                const displayLabel = getTranslatedLabel(baseLabel);
+                const options = configData.feature_options ? configData.feature_options[name] : null;
+
+                // Large dropdown: >5 options → full-width select
+                if (options && options.length > 5) {
+                    let optionsHtml = `<option value="" disabled selected>${translations[currentLang].opt_select}</option>`;
+                    options.forEach(opt => {
+                        optionsHtml += `<option value="${opt}">${opt}</option>`;
+                    });
+                    html += `
+                        <div class="form-group full-width">
+                            <label for="${name}">${displayLabel}</label>
+                            <select id="${name}" name="${name}" required>
+                                ${optionsHtml}
+                            </select>
+                        </div>`;
+                } 
+                // Small list (≤5 options): segmented pill buttons, half-width
+                else if (options && options.length <= 5) {
+                    let pillsHtml = '';
+                    options.forEach((opt, idx) => {
+                        const displayVal = getTranslatedValue(opt);
+                        const isChecked = idx === 0 ? 'checked' : ''; // Select first by default
+                        pillsHtml += `
+                            <input type="radio" id="${name}_${idx}" name="${name}" value="${opt}" ${isChecked}>
+                            <label for="${name}_${idx}" class="pill-label">${displayVal}</label>
+                        `;
+                    });
+                    html += `
+                        <div class="form-group">
+                            <label>${displayLabel}</label>
+                            <div class="pill-group">
+                                ${pillsHtml}
+                            </div>
+                        </div>`;
+                } 
+                else {
+                    html += `
+                        <div class="form-group full-width">
+                            <label for="${name}">${displayLabel}</label>
+                            <input type="text" id="${name}" name="${name}" required autocomplete="off">
+                        </div>`;
+                }
+            });
+            
+            // Add submit button inside the grid so it spans full width at the bottom
+            html += `<button type="submit" class="btn-submit" id="submit-btn">${translations[currentLang].btn_run}</button>`;
+            
+            document.getElementById('dynamic-inputs').innerHTML = html;
+        }
+
         window.addEventListener('DOMContentLoaded', async () => {
+            updateLanguage('en'); 
+
             try {
                 const res = await fetch(`${API_BASE}/config?v=` + new Date().getTime());
                 configData = await res.json();
-                document.getElementById('model-subtitle').innerText = configData.model_info.model_name + " Model Demo";
                 
-                let html = '';
-                configData.feature_names.forEach((name, i) => {
-                    const label = configData.feature_labels[i] || name;
-                    const options = configData.feature_options ? configData.feature_options[name] : null;
-
-                    if (options && options.length > 0) {
-                        let optionsHtml = '<option value="" disabled selected>Select an option...</option>';
-                        options.forEach(opt => {
-                            optionsHtml += `<option value="${opt}">${opt}</option>`;
-                        });
-                        html += `
-                            <div class="form-group">
-                                <label for="${name}">${label}</label>
-                                <select id="${name}" required>
-                                    ${optionsHtml}
-                                </select>
-                            </div>`;
-                    } else {
-                        html += `
-                            <div class="form-group">
-                                <label for="${name}">${label}</label>
-                                <input type="text" id="${name}" required placeholder="Type value here..." autocomplete="off">
-                            </div>`;
-                    }
-                });
-                document.getElementById('dynamic-inputs').innerHTML = html;
+                document.getElementById('model-subtitle').innerText = configData.model_info.model_name + " Model";
+                renderForm();
 
                 if (configData.model_info) {
                     document.getElementById('metrics-container').innerHTML = `
-                        <div class="metric"><div class="metric-value">${configData.model_info.metric1_value}</div><div class="metric-label">${configData.model_info.metric1_label}</div></div>
-                        <div class="metric"><div class="metric-value">${configData.model_info.metric2_value}</div><div class="metric-label">${configData.model_info.metric2_label}</div></div>
+                        <div class="metric">
+                            <div class="metric-value">${configData.model_info.metric1_value}</div>
+                            <div class="metric-label">${configData.model_info.metric1_label}</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">${configData.model_info.metric2_value}</div>
+                            <div class="metric-label">Acc. / Conf. Matrix</div>
+                        </div>
                     `;
                 }
             } catch (err) {
-                document.getElementById('dynamic-inputs').innerHTML = '<p style="color:#ef4444;">Could not connect to server. Run demo_server.py first!</p>';
+                document.getElementById('dynamic-inputs').innerHTML = `
+                    <div style="grid-column: 1/-1; padding: 2rem; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 12px; color: #ef4444; text-align: center;">
+                        <svg style="width: 48px; height: 48px; margin-bottom: 1rem; opacity: 0.8;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                        <p><strong data-i18n="err_connect">${translations[currentLang].err_connect}</strong></p>
+                        <p style="font-size: 0.9rem; margin-top: 0.5rem;" data-i18n="err_desc">${translations[currentLang].err_desc}</p>
+                    </div>`;
             }
         });
 
+        // Handle Form Submit
         document.getElementById('predict-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!configData) return;
 
+            const submitBtn = document.getElementById('submit-btn');
+            submitBtn.innerText = translations[currentLang].btn_running;
+            submitBtn.style.opacity = '0.7';
+
             const features = {};
-            configData.feature_names.forEach(name => { features[name] = document.getElementById(name).value; });
+            configData.feature_names.forEach(name => {
+                // Check if it's a select/text input or radio group
+                const el = document.getElementById(name);
+                if (el) {
+                    features[name] = el.value;
+                } else {
+                    const checkedRadio = document.querySelector(`input[name="${name}"]:checked`);
+                    if (checkedRadio) features[name] = checkedRadio.value;
+                }
+            });
+
+            // Validation for dropdowns that might not be selected
+            for (const key in features) {
+                if (!features[key]) {
+                    alert(currentLang === 'tr' ? 'Lütfen tüm alanları doldurun.' : 'Please fill all fields.');
+                    submitBtn.innerText = translations[currentLang].btn_run;
+                    submitBtn.style.opacity = '1';
+                    return;
+                }
+            }
 
             try {
                 const res = await fetch(`${API_BASE}/predict`, {
@@ -237,21 +1366,65 @@
                 });
                 const result = await res.json();
                 
-                if (result.error) return alert("Error: " + result.error);
+                if (result.error) {
+                    alert("Error: " + result.error);
+                    submitBtn.innerText = translations[currentLang].btn_run;
+                    submitBtn.style.opacity = '1';
+                    return;
+                }
 
+                // Show Results Panel
                 document.getElementById('placeholder').style.display = 'none';
                 const content = document.getElementById('result-content');
                 content.style.display = 'block';
-                content.style.animation = 'none'; content.offsetHeight; content.style.animation = null;
+                
+                content.style.animation = 'none'; 
+                content.offsetHeight; 
+                content.style.animation = null;
 
+                // Update Badge
                 const badge = document.getElementById('prediction-badge');
+                const predText = document.getElementById('pred-value-text');
                 const cls = result.predicted_class;
-                badge.textContent = cls;
-                badge.className = 'prediction-badge';
-                if (cls.toLowerCase() === 'positive') badge.classList.add('badge-positive');
-                else if (cls.toLowerCase() === 'negative') badge.classList.add('badge-negative');
-                else badge.classList.add('badge-neutral');
+                
+                let translatedCls = cls;
+                if(currentLang === 'tr') {
+                    if(cls.toLowerCase() === 'positive') translatedCls = 'Pozitif';
+                    else if(cls.toLowerCase() === 'negative') translatedCls = 'Negatif';
+                    else if(cls.toLowerCase() === 'neutral') translatedCls = 'Nötr';
+                }
 
+                predText.textContent = translatedCls;
+                badge.className = 'prediction-badge';
+
+                // Shift the overlay background colour — smooth CSS transition
+                const dashBg = document.getElementById('dash-bg');
+                dashBg.classList.remove('sent-positive', 'sent-negative', 'sent-neutral');
+
+                if (cls.toLowerCase() === 'positive') {
+                    badge.classList.add('badge-positive');
+                    requestAnimationFrame(() => {
+                        dashBg.classList.add('sent-positive');
+                        document.documentElement.style.setProperty('--primary-glow', 'rgba(16, 185, 129, 0.25)');
+                        document.documentElement.style.setProperty('--secondary-glow', 'rgba(0, 230, 118, 0.22)');
+                    });
+                } else if (cls.toLowerCase() === 'negative') {
+                    badge.classList.add('badge-negative');
+                    requestAnimationFrame(() => {
+                        dashBg.classList.add('sent-negative');
+                        document.documentElement.style.setProperty('--primary-glow', 'rgba(239, 68, 68, 0.35)');
+                        document.documentElement.style.setProperty('--secondary-glow', 'rgba(220, 38, 38, 0.30)');
+                    });
+                } else {
+                    badge.classList.add('badge-neutral');
+                    requestAnimationFrame(() => {
+                        dashBg.classList.add('sent-neutral');
+                        document.documentElement.style.setProperty('--primary-glow', 'rgba(245, 158, 11, 0.30)');
+                        document.documentElement.style.setProperty('--secondary-glow', 'rgba(217, 119, 6, 0.25)');
+                    });
+                }
+
+                // Update Probabilities
                 const probContainer = document.getElementById('probabilities-container');
                 probContainer.innerHTML = '';
                 const probs = result.all_probabilities;
@@ -262,19 +1435,114 @@
                     if (c.toLowerCase() === 'positive') colorClass = 'fill-Positive';
                     if (c.toLowerCase() === 'negative') colorClass = 'fill-Negative';
 
+                    let tClass = c;
+                    if(currentLang === 'tr') {
+                        if(c.toLowerCase() === 'positive') tClass = 'Pozitif';
+                        if(c.toLowerCase() === 'negative') tClass = 'Negatif';
+                        if(c.toLowerCase() === 'neutral') tClass = 'Nötr';
+                    }
+
                     probContainer.innerHTML += `
                         <div class="prob-bar-container">
-                            <div class="prob-header"><span>${c}</span><span>${(probs[c] * 100).toFixed(1)}%</span></div>
-                            <div class="prob-track"><div class="prob-fill ${colorClass}" style="width: 0%"></div></div>
+                            <div class="prob-header">
+                                <span>${tClass}</span>
+                                <span>${(probs[c] * 100).toFixed(1)}%</span>
+                            </div>
+                            <div class="prob-track">
+                                <div class="prob-fill ${colorClass}" style="width: 0%"></div>
+                            </div>
                         </div>`;
                 });
 
                 setTimeout(() => {
                     const fills = probContainer.querySelectorAll('.prob-fill');
-                    sortedClasses.forEach((c, i) => fills[i].style.width = (probs[c] * 100) + '%');
-                }, 50);
+                    sortedClasses.forEach((c, i) => {
+                        fills[i].style.width = (probs[c] * 100) + '%';
+                    });
+                }, 100);
 
-            } catch (err) { alert("Server error."); }
+                // Update Dynamic Insights Card
+                const insightsContainer = document.getElementById('dynamic-insights-container');
+                insightsContainer.innerHTML = '';
+                
+                if (result.data_insights) {
+                    const di = result.data_insights;
+                    let title = currentLang === 'tr' ? '💡 VERİ SETİNDEN İÇGÖRÜ' : '💡 DATA-DRIVEN INSIGHT';
+                    let desc = '';
+                    let stats = null;
+                    
+                    if (di.charging_patience && di.charging_patience.home_charging === 'No' && di.charging_patience.patience === 'Low') {
+                        stats = di.charging_patience.stats;
+                        desc = currentLang === 'tr' 
+                            ? `Evde şarj imkanı <strong>olmayan</strong> ve <strong>düşük sabırlı</strong> kullanıcılar, Reddit veri setimizde en yüksek memnuniyetsizliği bildiren gruptur. Bu segmentteki gerçek kullanıcıların <strong>%${stats.neg}</strong>'i negatif his bildirmiştir (Genel ortalama olan %18.2'nin tam iki katı!).`
+                            : `Users with <strong>No Home Charging</strong> and <strong>Low Patience</strong> are the most dissatisfied segment in our Reddit dataset. Specifically, <strong>%${stats.neg}</strong> of these users reported negative sentiment (more than double the overall average of 18.2%!).`;
+                    } 
+                    else if (di.charging_patience && di.charging_patience.home_charging === 'Yes' && di.charging_patience.patience === 'High') {
+                        stats = di.charging_patience.stats;
+                        desc = currentLang === 'tr'
+                            ? `Evde şarj imkanı <strong>olan</strong> ve <strong>yüksek sabırlı</strong> EV kullanıcıları veri setimizdeki en mutlu gruptur. Bu segmentin <strong>%${stats.pos}</strong>'i tamamen pozitif geri bildirim yaparken, negatif memnuniyet oranı sadece <strong>%${stats.neg}</strong> seviyesindedir.`
+                            : `EV users with <strong>Home Charging</strong> and <strong>High Patience</strong> are the happiest group in our dataset. <strong>%${stats.pos}</strong> of this segment reported fully positive satisfaction, with a negative rate of just <strong>%${stats.neg}</strong>.`;
+                    }
+                    else if (di.patience && di.patience.value === 'High') {
+                        stats = di.patience.stats;
+                        desc = currentLang === 'tr'
+                            ? `Sabır düzeyi <strong>Yüksek</strong> olan kullanıcılar için EV sahipliği son derece pozitif geçmektedir. Reddit veri setindeki yüksek sabırlı kullanıcıların <strong>%${stats.pos}</strong>'i pozitif deneyim bildirirken, negatif bildirenlerin oranı sadece <strong>%${stats.neg}</strong>'tir.`
+                            : `EV ownership is extremely positive for users with <strong>High Patience</strong>. <strong>%${stats.pos}</strong> of high-patience users in our Reddit dataset reported positive experiences, while only <strong>%${stats.neg}</strong> reported negative ones.`;
+                    }
+                    else if (di.patience && di.patience.value === 'Low') {
+                        stats = di.patience.stats;
+                        desc = currentLang === 'tr'
+                            ? `Sabırsız (Low Patience) sürücüler için EV deneyimi zorlayıcı olabilmektedir. Veri setimizde sabrı düşük kullanıcıların negatif bildirim oranı <strong>%${stats.neg}</strong>'a çıkmaktadır (Yüksek sabırlıların 10 katı!).`
+                            : `The EV experience can be challenging for drivers with <strong>Low Patience</strong>. In our dataset, the negative sentiment rate for low-patience users rises to <strong>%${stats.neg}</strong> (nearly 10x higher than high-patience users!).`;
+                    }
+                    else if (di.battery_climate && di.battery_climate.battery === 'LFP' && di.battery_climate.climate === 'Hot') {
+                        stats = di.battery_climate.stats;
+                        desc = currentLang === 'tr'
+                            ? `Sıcak iklimlerde LFP batarya kullanan kullanıcılarda negatif deneyim oranı <strong>%${stats.neg}</strong>'a yükselirken, pozitif memnuniyet <strong>%${stats.pos}</strong> seviyesinde kalmaktadır. Sıcak iklimlerde LFP şarj performansı memnuniyeti etkileyebilmektedir.`
+                            : `For users with <strong>LFP Batteries</strong> in <strong>Hot Climates</strong>, the negative sentiment rate increases to <strong>%${stats.neg}</strong>, with positive sentiment at <strong>%${stats.pos}</strong>. Hot climates can impact LFP charging satisfaction.`;
+                    }
+                    else if (di.battery_climate && di.battery_climate.battery === 'NMC' && di.battery_climate.climate === 'Mild') {
+                        stats = di.battery_climate.stats;
+                        desc = currentLang === 'tr'
+                            ? `Ilıman (Mild) iklimde NMC batarya tercih eden sürücülerin <strong>%${stats.pos}</strong>'i pozitif bildirim yapmıştır. Ancak aynı ılıman şartlarda LFP bataryaya sahip olanlarda negatif oranı sadece <strong>%8.0</strong>'dir.`
+                            : `<strong>%${stats.pos}</strong> of NMC battery users in <strong>Mild Climates</strong> reported positive satisfaction. Interestingly, under the same mild conditions, LFP users have a negative rate of just <strong>8.0%</strong>.`;
+                    }
+                    else if (di.brand) {
+                        stats = di.brand.stats;
+                        desc = currentLang === 'tr'
+                            ? `Veri setimizdeki <strong>${di.brand.brand}</strong> kullanıcılarının <strong>%${stats.pos}</strong>'i pozitif deneyim bildirirken, <strong>%${stats.neg}</strong>'i negatif deneyim bildirmiştir (Toplam ${stats.total} Reddit yorumu incelenmiştir).`
+                            : `Among <strong>${di.brand.brand}</strong> users in our dataset, <strong>%${stats.pos}</strong> reported positive experiences and <strong>%${stats.neg}</strong> reported negative experiences (analyzing ${stats.total} total Reddit reviews).`;
+                    }
+                    
+                    if (stats) {
+                        insightsContainer.innerHTML = `
+                            <div class="insights-card">
+                                <div class="insights-card-title">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                    <span>${title}</span>
+                                </div>
+                                <div class="insights-card-desc">${desc}</div>
+                                <div class="insights-chart">
+                                    <div class="insights-chart-segment segment-pos" style="width: ${stats.pos}%" title="Positive: ${stats.pos}%"></div>
+                                    <div class="insights-chart-segment segment-neu" style="width: ${stats.neu}%" title="Neutral: ${stats.neu}%"></div>
+                                    <div class="insights-chart-segment segment-neg" style="width: ${stats.neg}%" title="Negative: ${stats.neg}%"></div>
+                                </div>
+                                <div class="insights-legend">
+                                    <span class="legend-pos">${currentLang === 'tr' ? 'Pozitif' : 'Positive'}: ${stats.pos}%</span>
+                                    <span class="legend-neu">${currentLang === 'tr' ? 'Nötr' : 'Neutral'}: ${stats.neu}%</span>
+                                    <span class="legend-neg">${currentLang === 'tr' ? 'Negatif' : 'Negative'}: ${stats.neg}%</span>
+                                </div>
+                            </div>
+                        `;
+                    }
+                }
+
+            } catch (err) { 
+                alert("Server error. Make sure demo_server.py is running."); 
+            } finally {
+                submitBtn.innerText = translations[currentLang].btn_run;
+                submitBtn.style.opacity = '1';
+            }
         });
     </script>
 </body>
